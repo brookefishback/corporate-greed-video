@@ -1,10 +1,3 @@
-#I want a point of sale solution for Family Video’s rivals
-#At very minimum it needs to have a stock of 5 rentable titles
-#Employee should be able to register new users, rent titles to users, and check titles back in
-#Any other functionality is secondary but welcome.
-#I don’t care how you implement checking in/out, but no shortcuts/fakery
-#Don’t have to have it done by next week, but iterate so that you can at least demo features as they are completed
-
 from datetime import date
 
 #CREATE CLASSES - CUSTOMERS, TRANSACTIONS + MOVIES
@@ -14,24 +7,34 @@ class Customer:
         self.number = number
 
 class Transaction:
-    def __init__(self, transaction, time, total):
+    def __init__(self, transaction):
         self.transaction = transaction
-        self.time = time
-        self.total = total
+#        self.time = time
+#        self.total = total
 
 class Movie:
-    def __init__(self, title, price):
+    def __init__(self, title):
         self.title = title
-        self.price = price
+#        self.price = price
 
+transaction_list = []
 #CREATE MASTER TITLE LIST
 title_list = [
     "Gone With the Wind", 
     "Shawshank Redemption", 
     "Pulp Fiction", 
-    "Cruel Intentions," 
+    "Cruel Intentions", 
     "The Godfather", 
     "Casablanca"]
+
+def inventory_creation():
+    movie_inventory = []
+    for titles in title_list:
+            movie_inventory.append(Movie(titles))
+    return movie_inventory
+
+available_titles = inventory_creation()
+
 
 #MASTER CLIENT LIST - ADD ALL NEW CLIENTS TO THIS LIST
 client_list = []
@@ -40,7 +43,7 @@ client_list = []
 def new_client():
     input_new_client_name = input("Input the new client's name: ")
     input_new_client_number = input("Phone number: ")
-    new_client_to_list = Order(input_new_client_name,input_new_client_number)
+    new_client_to_list = Customer(input_new_client_name,input_new_client_number)
     client_list.append(new_client_to_list)
     for list_number, clients in enumerate(client_list,1):
         print(str(list_number), ".", clients.name),
@@ -61,25 +64,24 @@ def check_out(client_list):
     select_from_client_list = int(select_from_client_list) - 1
     print("You have selected "+client_list[select_from_client_list].name), 
     print()
-    for list_number, movies in enumerate(title_list,1):
-        print(str(list_number), ".", movies)
 
-    select_from_movie_list = input("Please select the movie rented: ")
+    for list_number, movies in enumerate(available_titles,1):
+        print(str(list_number), ".", movies.title)
+
+    select_from_movie_list = input("Please select the movie you'd like rented: ")
     select_from_movie_list = int(select_from_movie_list) - 1
-    print("You have selected "+title_list[select_from_movie_list])
+    print("You have selected "+available_titles[select_from_movie_list].title)
     title_rental = input("Would you like to rent this movie? Y or N: ")
+# TIME and TOTAL NEEDS TO GO IN HERE    
     if title_rental == "Y":
-        Order.title = title_list[select_from_movie_list]
-        client_list[select_from_client_list].title = Order.title
-        print(client_list[select_from_client_list].name + " has rented " + client_list[select_from_client_list].title)
-        Order.time = time_and_date_stamp()
-        client_list[select_from_client_list].time = Order.time
-# NEED TO CONVERT TO 3 or 5 DAYS?        
-        print(client_list[select_from_client_list].time)
-        Order.title = ''
-        Order.time = ''
-#   elif title_rental == "N":
+        new_rental = [client_list[select_from_client_list].name,available_titles[select_from_movie_list].title]
+        transaction_list.append(Transaction(new_rental))
+        print(client_list[select_from_client_list].name + " has rented " + available_titles[select_from_movie_list].title + ".")
+        for finalization in transaction_list:
+            print(finalization.transaction)
 
+    elif title_rental == "N":
+        main()
 
 
 
