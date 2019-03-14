@@ -1,24 +1,28 @@
-from datetime import date
+## NEED TO MAKE A PRICE FOR MOVIES IN CLASS 
+## NEED TO MAKE A TOTAL AMOUNT FOR TRANSACTION IN CHECKOUT
+## NEED TO MAKE A TIMEDELTA IN ORDER TO DETERMINE WHEN MOVIE IS DUE
+## TRYING TO FIGURE OUT THE PROCESS OF CLIENT CHECK-IN SHOULD BE
+## VIEW ORDER NEEDS TO EXTRA TLC
 
-#CREATE CLASSES - CUSTOMERS, TRANSACTIONS + MOVIES
+from datetime import datetime
+
 class Customer:
     def __init__(self, name, number):
         self.name = name
         self.number = number
 
 class Transaction:
-    def __init__(self, transaction):
-        self.transaction = transaction
-#        self.time = time
-#        self.total = total
+    def __init__(self, name, number, movie, time):
+        self.name = name
+        self.number = number
+        self.movie = movie
+        self.time = time
 
 class Movie:
     def __init__(self, title):
         self.title = title
 #        self.price = price
 
-transaction_list = []
-#CREATE MASTER TITLE LIST
 title_list = [
     "Gone With the Wind", 
     "Shawshank Redemption", 
@@ -35,62 +39,98 @@ def inventory_creation():
 
 available_titles = inventory_creation()
 
-
-#MASTER CLIENT LIST - ADD ALL NEW CLIENTS TO THIS LIST
 client_list = []
+transaction_list = []
+time_of_rental = datetime.now()
 
-#MENU ITEM 1 - REGISTER NEW CLIENT
+def list_of_available_clients():
+    for list_number, clients in enumerate(client_list,1):
+        print(str(list_number), ".", clients.name),
+        print("    Phone number: ", clients.number),
+
+def list_of_available_movies():
+    for list_number, movies in enumerate(available_titles,1):
+        print(str(list_number), ".", movies.title)
+
+def display_transaction_list():
+    for list_number, finalization in enumerate(transaction_list,1):
+        print(str(list_number), ".", 
+        "Client Name: " + finalization.name + '\n'
+        "Client Phone Number: " + finalization.number + '\n'
+        "Movie Rented: " + finalization.movie + '\n'
+        "Date Rented: " + finalization.time)  
+
 def new_client():
     input_new_client_name = input("Input the new client's name: ")
     input_new_client_number = input("Phone number: ")
     new_client_to_list = Customer(input_new_client_name,input_new_client_number)
     client_list.append(new_client_to_list)
-    for list_number, clients in enumerate(client_list,1):
-        print(str(list_number), ".", clients.name),
-        print("    Phone number: ", clients.number),
-        print()
+    print()
 
-#MENU ITEM 2 - CHECK OUT FUNCTION
-## NEED TO MAKE THIS INTO SEPERATE FUNCTIONS
-## NOT SURE WHAT TO DO WITH TRANSACTION
 def check_out(client_list):
     print("Please select the client that wants to rent a movie. ")
-    for list_number, clients in enumerate(client_list,1):
-        print(str(list_number), ".", clients.name),
-        print("    Phone number: ", clients.number),
-        print()
+    list_of_available_clients()
+    print()
 
     select_from_client_list = input("")
     select_from_client_list = int(select_from_client_list) - 1
-    print("You have selected "+client_list[select_from_client_list].name), 
+    print("You have selected " + client_list[select_from_client_list].name), 
     print()
 
-    for list_number, movies in enumerate(available_titles,1):
-        print(str(list_number), ".", movies.title)
+    list_of_available_movies()
 
     select_from_movie_list = input("Please select the movie you'd like rented: ")
     select_from_movie_list = int(select_from_movie_list) - 1
-    print("You have selected "+available_titles[select_from_movie_list].title)
+    print("You have selected " + available_titles[select_from_movie_list].title)
     title_rental = input("Would you like to rent this movie? Y or N: ")
-# TIME and TOTAL NEEDS TO GO IN HERE    
+
+    selected_client_name = client_list[select_from_client_list].name
+    selected_client_number = client_list[select_from_client_list].number
+    selected_movie = available_titles[select_from_movie_list].title
+ 
     if title_rental == "Y":
-        new_rental = [client_list[select_from_client_list].name,available_titles[select_from_movie_list].title]
-        transaction_list.append(Transaction(new_rental))
-        print(client_list[select_from_client_list].name + " has rented " + available_titles[select_from_movie_list].title + ".")
-        for finalization in transaction_list:
-            print(finalization.transaction)
+        transaction_list.append(Transaction(selected_client_name, selected_client_number, selected_movie, time_of_rental.strftime("%m/%d/%Y")))
+        print(selected_client_name + " has rented " + selected_movie + ".")
 
     elif title_rental == "N":
-        main()
-
-
-
+        return
 
 #MENU ITEM 3 - CHECK IN TITLE FUNCTION
 #def check_in():
 
+
 #MENU ITEM 4 - VIEW ORDER FUCNTION - PRINTS ORDER LIST FOR SALESMAN
-#def view_orders():
+def view_orders(transaction_list):
+    client_check = []
+    print("Please type S to search for a client.")
+    print("Type ALL if you'd like to see the whole list.")
+    view_order_type = input("")
+    if view_order_type == "S":
+        client_phone_number = input("Please input the client's number. ")
+        for check in range(len(transaction_list)):
+            if len(transaction_list) > 0:
+                client_check.append(transaction_list.pop(0))
+                matching_client = [c for c in client_check if c.number == client_phone_number]
+                if matching_client:
+                    print("Client Name: " + matching_client[0].name + '\n'
+                    "Movie Rented: " + matching_client[0].movie + '\n'
+                    "Date Rented: " + matching_client[0].time)
+                    print()
+                    transaction_list.append(client_check.pop(0))
+
+                else:
+                    transaction_list.append(client_check.pop(0))
+        
+            elif len(transaction_list) < 1:
+                print ("There are currently no Clients.")
+                return
+
+    elif view_order_type == "ALL":
+        display_transaction_list()
+
+    else:
+        return
+
 
 #CREATE MAIN MENU FUNTION
 def main():
@@ -101,15 +141,6 @@ def main():
     menu['4']="View Orders"
     menu['5']="Exit/Quit"
 
-#CREATE TIME STAMP
-def time_and_date_stamp():
-    today_date = date.today()
-    return today_date
-
-#CREATE ORDER NUMBER
-def transaction_number():
-    transaction_order = len(active_titles) + 1
-    return transaction_order
 
 #WHILE AND IF STATEMENTS TO HANDLE SALESMEN'S MENU CHOICES
 user=True
@@ -129,7 +160,7 @@ while user:
     elif answer=="3":
         check_in()
     elif answer=="4":
-        view_orders()
+        view_orders(transaction_list)
     elif answer=="5":
         print("\n Goodbye")
         break
